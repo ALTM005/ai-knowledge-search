@@ -10,6 +10,7 @@ class SearchReq(BaseModel):
     top_k: int = 5
 
 def _rows_to_dicts(cur, rows):
+    #Helper method for cleaner json
     cols = [d.name for d in cur.description]
     out = []
     for r in rows:
