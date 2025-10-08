@@ -1,5 +1,6 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException
 from pypdf import PdfReader
+from app.services.chunking import simple_chunk
 import os
 
 router = APIRouter()
@@ -20,6 +21,7 @@ async def ingest_pdf(file: UploadFile = File(...)):
     with open(path, "wb") as f:
         f.write(raw)
 
+    #extract the text
     try:
         reader = PdfReader(path)
         text = "\n".join([p.extract_text() or "" for p in reader.pages])
@@ -29,4 +31,14 @@ async def ingest_pdf(file: UploadFile = File(...)):
     if not text.strip():
         raise HTTPException(400, "No text extracted from PDF")
 
-    return {"filename": safe_name, "path": path, "extracted_chars": len(text)}
+    #chunk
+    chunks = simple_chunk(text)
+    if not chunks:
+        raise HTTPException(400, "Chunking produced no chunks")
+
+    return {
+        "filename": safe_name,
+        "path": path,
+        "extracted_chars": len(text),
+        "chunks": len(chunks),
+    }
