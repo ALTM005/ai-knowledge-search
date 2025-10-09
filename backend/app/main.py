@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import dbtest, ingest
+from app.routers import dbtest, ingest, search
 
 app = FastAPI()
 
@@ -14,6 +14,7 @@ app.add_middleware(
 
 app.include_router(dbtest.router, prefix="/db", tags=["db"])
 app.include_router(ingest.router, prefix="/ingest", tags=["ingest"])
+app.include_router(search.router, prefix="/search", tags=["search"])
 
 @app.get("/health")
 def health():
