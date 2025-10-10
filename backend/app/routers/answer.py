@@ -1,9 +1,11 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
+from openai import OpenAI
 from app.services.embeddings import embed_texts
 from app.db import get_conn
 
 router = APIRouter()
+client = OpenAI()
 
 SYSTEM = (
     "You are a concise research assistant. Answer using ONLY the provided context. "
@@ -46,11 +48,21 @@ def answer(req: AnswerReq):
         return {"answer": "I don't know.", "citations": [], "chunks": []}
 
     ids = [h["id"] for h in hits]
-
     context = "\n\n".join(
         f"(chunk {h['id']}): { (h['content'] or '').replace('\\n', ' ')[:2000] }"
         for h in hits
     )
     prompt = f"Context:\n{context}\n\nQuestion: {q}\n\nFollow the system instructions."
 
-    return {"_debug_prompt": prompt, "citations": ids, "chunks": hits}
+
+    resp = client.chat.completions.create(
+        model=req.model,
+        temperature=0.2,
+        messages=[
+            {"role": "system", "content": SYSTEM},
+            {"role": "user", "content": prompt},
+        ],
+    )
+    answer = resp.choices[0].message.content
+
+    return {"answer": answer, "citations": ids, "chunks": hits}
