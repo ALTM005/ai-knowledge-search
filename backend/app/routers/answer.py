@@ -45,4 +45,12 @@ def answer(req: AnswerReq):
     if not hits:
         return {"answer": "I don't know.", "citations": [], "chunks": []}
 
-    return {"answer": "", "citations": [h["id"] for h in hits], "chunks": hits}
+    ids = [h["id"] for h in hits]
+
+    context = "\n\n".join(
+        f"(chunk {h['id']}): { (h['content'] or '').replace('\\n', ' ')[:2000] }"
+        for h in hits
+    )
+    prompt = f"Context:\n{context}\n\nQuestion: {q}\n\nFollow the system instructions."
+
+    return {"_debug_prompt": prompt, "citations": ids, "chunks": hits}
