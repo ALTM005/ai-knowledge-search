@@ -15,6 +15,7 @@ app.add_middleware(
 app.include_router(dbtest.router, prefix="/db", tags=["db"])
 app.include_router(ingest.router, prefix="/ingest", tags=["ingest"])
 app.include_router(search.router, prefix="/search", tags=["search"])
+app.include_router(answer.router,  prefix="/answer", tags=["answer"])
 
 @app.get("/health")
 def health():
