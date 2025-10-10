@@ -1,5 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
+from app.services.embeddings import embed_texts
+from app.db import get_conn
 
 router = APIRouter()
 
@@ -23,4 +25,24 @@ def answer(req: AnswerReq):
     if not (1 <= req.top_k <= 20):
         raise HTTPException(400, "top_k must be between 1 and 20")
 
-    return {"answer": "", "citations": [], "chunks": []}
+    [qvec] = embed_texts([q])
+
+    sql = """
+        SELECT
+          c.id,
+          c.document_id,
+          c.chunk_index,
+          c.content,
+          1 - (c.embedding <=> %s::vector) AS score
+        FROM chunks c
+        ORDER BY c.embedding <=> %s::vector
+        LIMIT %s;
+    """
+    with get_conn() as conn, conn.cursor() as cur:
+        cur.execute(sql, (qvec, qvec, req.top_k))
+        hits = cur.fetchall()
+
+    if not hits:
+        return {"answer": "I don't know.", "citations": [], "chunks": []}
+
+    return {"answer": "", "citations": [h["id"] for h in hits], "chunks": hits}
