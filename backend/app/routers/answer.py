@@ -73,6 +73,8 @@ def generate_answer(request: AnswerRequest):
             })
             context_list.append(chunk_text)
 
+        system_prompt = "You are a helpful assistant. Answer using ONLY the provided context. Cite sources like [1]."
+        user_prompt = f"Context:\n{context_text}\n\nQuestion: {request.query}"
 
     resp = client.chat.completions.create(
         model=req.model,
