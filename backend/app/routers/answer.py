@@ -4,9 +4,10 @@ from pydantic import BaseModel
 from openai import OpenAI
 from app.services.embeddings import embed_texts
 from app.db import get_conn
+from app.services.embeddings import embed_texts
 
 router = APIRouter()
-client = OpenAI()
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 SYSTEM = (
     "You are a concise research assistant. Answer using ONLY the provided context. "
