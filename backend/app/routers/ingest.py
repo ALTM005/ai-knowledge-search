@@ -52,13 +52,12 @@ async def ingest_file(file: UploadFile = File(...), title: str | None = None):
     
     vectors = embed_texts(chunks)
 
-        for i, (c_text, vec) in enumerate(zip(chunks, vectors)):
+    conn = get_conn()
+    try:
+        with conn.cursor() as cur:
             cur.execute(
-                """
-                insert into chunks(document_id, chunk_index, content, embedding, tokens)
-                values (%s, %s, %s, %s, %s)
-                """,
-                (doc_id, i, c_text, vec, len(c_text.split()))
+                "INSERT INTO documents(title, source, filepath) VALUES(%s,%s,%s) RETURNING id",
+                (title or safe_name, "upload", path),
             )
 
     return {"document_id": str(doc_id), "chunks": len(chunks)}
