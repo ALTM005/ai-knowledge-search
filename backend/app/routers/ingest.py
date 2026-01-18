@@ -1,27 +1,25 @@
+import os
+import pdfplumber
 from fastapi import APIRouter, UploadFile, File, HTTPException
-from pypdf import PdfReader
 from app.db import get_conn
 from app.services.chunking import simple_chunk
 from app.services.embeddings import embed_texts
-import os
-
 
 router = APIRouter()
 
 @router.post("/pdf")
-async def ingest_pdf(file: UploadFile = File(...), title: str | None = None):
-    if not file.filename.lower().endswith(".pdf"):
-        raise HTTPException(400, "Please upload a PDF")
+async def ingest_file(file: UploadFile = File(...), title: str | None = None):
+    filename = file.filename.lower()
+    
+    if not (filename.endswith(".pdf") or filename.endswith(".txt")):
+        raise HTTPException(400, "Please upload a PDF or TXT file")
 
-    raw = await file.read()
-    if not raw:
-        raise HTTPException(400, "Empty file upload")
-
-    #saving a local copy 
-    safe_name = os.path.basename(file.filename)
     save_dir = os.path.abspath(os.path.join(os.getcwd(), "..", "data"))
     os.makedirs(save_dir, exist_ok=True)
+    safe_name = os.path.basename(file.filename)
     path = os.path.join(save_dir, safe_name)
+    
+    raw = await file.read()
     with open(path, "wb") as f:
         f.write(raw)
 
