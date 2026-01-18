@@ -76,14 +76,19 @@ def generate_answer(request: AnswerRequest):
         system_prompt = "You are a helpful assistant. Answer using ONLY the provided context. Cite sources like [1]."
         user_prompt = f"Context:\n{context_text}\n\nQuestion: {request.query}"
 
-    resp = client.chat.completions.create(
-        model=req.model,
-        temperature=0.2,
-        messages=[
-            {"role": "system", "content": SYSTEM},
-            {"role": "user", "content": prompt},
-        ],
-    )
-    answer = resp.choices[0].message.content
+        response = client.chat.completions.create(
+            model="gpt-4o",
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt}
+            ],
+            temperature=0.3
+        )
+        
+        return AnswerResponse(
+            answer=response.choices[0].message.content,
+            citations=citations,
+            context_used=context_list
+        )
 
     return {"answer": answer, "citations": ids, "chunks": hits}
