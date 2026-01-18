@@ -23,12 +23,22 @@ async def ingest_file(file: UploadFile = File(...), title: str | None = None):
     with open(path, "wb") as f:
         f.write(raw)
 
-    #extract text
-    try:
-        reader = PdfReader(path)
-        text = "\n".join([p.extract_text() or "" for p in reader.pages])
-    except Exception as e:
-        raise HTTPException(400, f"Failed to read PDF: {e}")
+    text = ""
+    if filename.endswith(".txt"):
+        try:
+            text = raw.decode("utf-8")
+        except UnicodeDecodeError:
+            text = raw.decode("latin-1")        
+    else:
+        try:
+            with pdfplumber.open(path) as pdf:
+                for page in pdf.pages:
+                    extracted = page.extract_text()
+                    if extracted:
+                        text += extracted + "\n\n"
+        except Exception as e:
+            print(f"PDF Error: {e}")
+            raise HTTPException(400, f"Failed to read PDF: {e}")
 
     #chunk and embed
     chunks = simple_chunk(text)
