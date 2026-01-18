@@ -15,7 +15,10 @@ try:
 except ImportError:
     pass
 
-DATABASE_URL = os.getenv("DATABASE_URL")
+def get_conn() -> psycopg.Connection:
+    db_url = os.getenv("DATABASE_URL")
+    if not db_url:
+        raise RuntimeError("DATABASE_URL is not set.")
 
 def get_conn():
     if not DATABASE_URL:
