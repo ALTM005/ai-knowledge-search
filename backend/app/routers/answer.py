@@ -55,8 +55,14 @@ def generate_answer(request: AnswerRequest):
                 context_used=[]
             )
 
-    if not hits:
-        return {"answer": "I don't know.", "citations": [], "chunks": []}
+        context_text = ""
+        citations = []
+        context_list = []
+        
+        for i, row in enumerate(rows):
+            chunk_text = row['content']
+            source_title = row.get('doc_title') or "Unknown"
+            score = row.get('score', 0)
 
     ids = [h["id"] for h in hits]
     context = "\n\n".join(
