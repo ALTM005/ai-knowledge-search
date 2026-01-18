@@ -1,12 +1,11 @@
-from typing import List
-import tiktoken
+import re
 
-def simple_chunk(text: str, max_tokens: int = 500, overlap: int = 60) -> List[str]:
-   
-    enc = tiktoken.get_encoding("cl100k_base")
-    toks = enc.encode(text or "")
-    if not toks:
-        return []
+def simple_chunk(text: str, chunk_size: int = 500, overlap: int = 50) -> list[str]:
+    """
+    Splits text into smaller overlapping chunks to improve search precision.
+    """
+    clean_text = re.sub(r'\s+', ' ', text).strip()
+    
     chunks = []
     i = 0
     while i < len(toks):
