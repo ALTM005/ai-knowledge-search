@@ -20,11 +20,16 @@ def get_conn() -> psycopg.Connection:
     if not db_url:
         raise RuntimeError("DATABASE_URL is not set.")
 
-def get_conn():
-    if not DATABASE_URL:
-        raise RuntimeError(
-            "DATABASE_URL is not set. Put it in backend/.env or export it."
+    try:
+        conn = psycopg.connect(
+            db_url, 
+            row_factory=dict_row, 
+            autocommit=False,
+            prepare_threshold=None 
         )
-    conn = psycopg.connect(DATABASE_URL, row_factory=dict_row)
-    register_vector(conn)
-    return conn
+        
+        register_vector(conn)
+        return conn
+    except psycopg.OperationalError as e:
+        print(f"DB Connection Failed: {e}")
+        raise e
