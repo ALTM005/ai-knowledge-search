@@ -11,26 +11,30 @@ client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 class AnswerRequest(BaseModel):
     query: str
-    top_k: int = 6
-    model: str = "gpt-4o-mini"
+    top_k: int = 5
 
-@router.post("/")
-def answer(req: AnswerReq):
-    q = (req.query or "").strip()
-    if not q:
-        raise HTTPException(400, "Query must not be empty")
-    if not (1 <= req.top_k <= 20):
-        raise HTTPException(400, "top_k must be between 1 and 20")
+class AnswerResponse(BaseModel):
+    answer: str
+    citations: list[dict]
+    context_used: list[str]
 
-    [qvec] = embed_texts([q])
+@router.post("/", response_model=AnswerResponse)
+def generate_answer(request: AnswerRequest):
+    conn = get_conn()
+    
+    try:
+        query_vecs = embed_texts([request.query])
+        if not query_vecs:
+            raise HTTPException(500, "Failed to generate embedding")
+        query_embedding = query_vecs[0]
 
-    sql = """
-        SELECT
-          c.id,
-          c.document_id,
-          c.chunk_index,
-          c.content,
-          1 - (c.embedding <=> %s::vector) AS score
+        sql = """
+        SELECT 
+            c.id, 
+            c.document_id, 
+            c.content, 
+            d.title as doc_title,
+            1 - (c.embedding <=> %s::vector) AS score
         FROM chunks c
         ORDER BY c.embedding <=> %s::vector
         LIMIT %s;
