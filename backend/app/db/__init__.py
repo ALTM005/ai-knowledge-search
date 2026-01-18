@@ -1,21 +1,18 @@
 import os
-from pathlib import Path
-
 import psycopg
+from pathlib import Path
 from psycopg.rows import dict_row
 from pgvector.psycopg import register_vector
 
-# Load .env
 try:
     from dotenv import load_dotenv
-
-    backend_dir = Path(__file__).resolve().parents[2] 
-    env_path = backend_dir / ".env"                    
+    base_dir = Path(__file__).resolve().parent.parent.parent
+    env_path = base_dir / ".env"
     if env_path.exists():
         load_dotenv(dotenv_path=env_path)
     else:
         load_dotenv() 
-except Exception:
+except ImportError:
     pass
 
 DATABASE_URL = os.getenv("DATABASE_URL")
