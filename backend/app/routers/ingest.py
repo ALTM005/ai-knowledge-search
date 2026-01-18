@@ -40,21 +40,17 @@ async def ingest_file(file: UploadFile = File(...), title: str | None = None):
             print(f"PDF Error: {e}")
             raise HTTPException(400, f"Failed to read PDF: {e}")
 
-    #chunk and embed
+    print(f"\nINGEST REPORT:")
+    print(f"   File: {safe_name}")
+    print(f"   Length: {len(text)} characters")
+    
+    if len(text) < 100:
+        raise HTTPException(400, "File is empty or could not be read.")
+
     chunks = simple_chunk(text)
-    if not chunks:
-        raise HTTPException(400, "No text extracted from PDF")
-
+    print(f"   Generated {len(chunks)} chunks.")
+    
     vectors = embed_texts(chunks)
-    if not vectors or len(vectors) != len(chunks):
-        raise HTTPException(400, "Failed to embed chunks")
-
-    with get_conn() as conn, conn.cursor() as cur:
-        cur.execute(
-            "insert into documents(title, source, filepath) values(%s,%s,%s) returning id",
-            (title or safe_name, "upload", path),
-        )
-        doc_id = cur.fetchone()["id"]
 
         for i, (c_text, vec) in enumerate(zip(chunks, vectors)):
             cur.execute(
