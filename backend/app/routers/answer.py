@@ -2,7 +2,6 @@ import os
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from openai import OpenAI
-from app.services.embeddings import embed_texts
 from app.db import get_conn
 from app.services.embeddings import embed_texts
 
