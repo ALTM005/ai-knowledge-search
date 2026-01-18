@@ -9,14 +9,7 @@ from app.services.embeddings import embed_texts
 router = APIRouter()
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-SYSTEM = (
-    "You are a concise research assistant. Answer using ONLY the provided context. "
-    "If the context is insufficient, say you don't know. "
-    'Keep answers short (3-6 sentences). '
-    "End with: 'Citations: [<chunk_ids>]' listing the chunk IDs you used."
-)
-
-class AnswerReq(BaseModel):
+class AnswerRequest(BaseModel):
     query: str
     top_k: int = 6
     model: str = "gpt-4o-mini"
