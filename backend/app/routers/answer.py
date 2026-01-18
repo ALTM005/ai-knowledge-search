@@ -36,12 +36,24 @@ def generate_answer(request: AnswerRequest):
             d.title as doc_title,
             1 - (c.embedding <=> %s::vector) AS score
         FROM chunks c
+        LEFT JOIN documents d ON c.document_id = d.id
         ORDER BY c.embedding <=> %s::vector
         LIMIT %s;
-    """
-    with get_conn() as conn, conn.cursor() as cur:
-        cur.execute(sql, (qvec, qvec, req.top_k))
-        hits = cur.fetchall()
+        """
+        
+        with conn.cursor() as cur:
+
+            cur.execute("SET LOCAL enable_indexscan = off;")
+            
+            cur.execute(sql, (query_embedding, query_embedding, request.top_k))
+            rows = cur.fetchall()
+            
+        if not rows:
+            return AnswerResponse(
+                answer="I couldn't find any relevant information in the uploaded documents.",
+                citations=[],
+                context_used=[]
+            )
 
     if not hits:
         return {"answer": "I don't know.", "citations": [], "chunks": []}
