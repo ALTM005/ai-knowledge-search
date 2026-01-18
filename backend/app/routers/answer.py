@@ -91,4 +91,8 @@ def generate_answer(request: AnswerRequest):
             context_used=context_list
         )
 
-    return {"answer": answer, "citations": ids, "chunks": hits}
+    except Exception as e:
+        print(f"Error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        conn.close()
