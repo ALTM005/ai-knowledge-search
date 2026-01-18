@@ -64,12 +64,14 @@ def generate_answer(request: AnswerRequest):
             source_title = row.get('doc_title') or "Unknown"
             score = row.get('score', 0)
 
-    ids = [h["id"] for h in hits]
-    context = "\n\n".join(
-        f"(chunk {h['id']}): { (h['content'] or '').replace('\\n', ' ')[:2000] }"
-        for h in hits
-    )
-    prompt = f"Context:\n{context}\n\nQuestion: {q}\n\nFollow the system instructions."
+            context_text += f"Source [{i+1}] ({source_title}): {chunk_text}\n\n"
+            citations.append({
+                "index": i+1, 
+                "title": source_title, 
+                "score": float(score),
+                "document_id": str(row['document_id'])
+            })
+            context_list.append(chunk_text)
 
 
     resp = client.chat.completions.create(
