@@ -59,5 +59,21 @@ async def ingest_file(file: UploadFile = File(...), title: str | None = None):
                 "INSERT INTO documents(title, source, filepath) VALUES(%s,%s,%s) RETURNING id",
                 (title or safe_name, "upload", path),
             )
+            doc_id = cur.fetchone()["id"]
 
-    return {"document_id": str(doc_id), "chunks": len(chunks)}
+            for i, (c_text, vec) in enumerate(zip(chunks, vectors)):
+                cur.execute(
+                    """
+                    INSERT INTO chunks(document_id, chunk_index, content, embedding, tokens)
+                    VALUES (%s, %s, %s, %s, %s)
+                    """,
+                    (doc_id, i, c_text, vec, len(c_text.split()))
+                )
+            conn.commit()
+            
+        return {"document_id": str(doc_id), "chunks": len(chunks)}
+    except Exception as e:
+        conn.rollback()
+        raise HTTPException(500, f"Database error: {e}")
+    finally:
+        conn.close()
