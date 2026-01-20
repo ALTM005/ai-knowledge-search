@@ -1,26 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Knowledge Search</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        .chat-container { height: calc(100vh - 160px); }
-        .source-card { transition: all 0.2s; }
-        .source-card:hover { transform: translateY(-2px); border-color: #3b82f6; }
+        .chat-container {
+            height: calc(100vh - 160px);
+        }
+
+        .source-card {
+            transition: all 0.2s;
+        }
+
+        .source-card:hover {
+            transform: translateY(-2px);
+            border-color: #3b82f6;
+        }
     </style>
 </head>
+
 <body class="bg-slate-50 font-sans">
 
     <div class="flex h-screen">
         <aside class="w-80 bg-white border-r border-slate-200 p-6 flex flex-col">
             <h1 class="text-xl font-bold text-slate-800 mb-8">Knowledge Base</h1>
-            
+
             <div class="mb-8">
                 <label class="block text-sm font-medium text-slate-600 mb-2">Upload Documents</label>
-                <input type="file" id="fileInput" class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer"/>
-                <button onclick="uploadFile()" id="uploadBtn" class="mt-4 w-full bg-blue-600 text-white py-2 rounded-lg font-medium hover:bg-blue-700 transition">Upload PDF/TXT</button>
+                <input type="file" id="fileInput"
+                    class="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 cursor-pointer" />
+                <button onclick="uploadFile()" id="uploadBtn"
+                    class="mt-4 w-full bg-blue-600 text-white py-2 rounded-lg font-medium hover:bg-blue-700 transition">Upload
+                    PDF/TXT</button>
             </div>
 
             <div class="flex-1 overflow-y-auto">
