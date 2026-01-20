@@ -10,6 +10,7 @@ A high-performance **RAG (Retrieval-Augmented Generation)** engine that transfor
 ---
 
 ## Table of Contents
+- [Screenshots](#screenshots)
 - [Features](#features)
 - [Project Structure](#project-structure)
 - [Tech Stack](#tech-stack)
@@ -18,6 +19,19 @@ A high-performance **RAG (Retrieval-Augmented Generation)** engine that transfor
 - [Usage](#usage)
 - [Database Maintenance](#database-maintenance)
 - [License](#license)
+
+---
+
+## Screenshots
+
+### Home / Landing Page
+![Landing Page](./assets/Home.png)
+
+### Document Ingestion
+![Upload Process](./assets/Upload_doc.png)
+
+### Contextual Chat & Citations
+![Chat Interface](./assets/Prompt.png)
 
 ---
 
