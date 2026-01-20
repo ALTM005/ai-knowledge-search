@@ -1,7 +1,7 @@
 import os
 import pdfplumber
 
-source_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../data/Computer Science Discourse Community Paper (1).pdf"))
+source_path = os.path.abspath(os.path.join(os.path.dirname(__file__)))
 dest_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../data/clean_paper.txt"))
 
 print(f"📖 Reading: {source_path}")

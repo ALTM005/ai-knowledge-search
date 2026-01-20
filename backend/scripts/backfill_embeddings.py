@@ -18,7 +18,7 @@ def main():
             rows = cur.fetchall()
 
             if not rows:
-                print("✅ No more rows to backfill.")
+                print("No more rows to backfill.")
                 break
 
             texts = [r["content"] or "" for r in rows]
