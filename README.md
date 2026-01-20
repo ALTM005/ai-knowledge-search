@@ -83,7 +83,7 @@ ai-knowledge-search/
 ### 1. Clone Repository
 
 ```bash
-git clone [https://github.com/yourusername/ai-knowledge-search.git](https://github.com/yourusername/ai-knowledge-search.git)
+git clone https://github.com/ALTM005/ai-knowledge-search.git
 cd ai-knowledge-search
 
 ```
